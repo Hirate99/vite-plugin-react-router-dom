@@ -2,18 +2,13 @@ import { PluginOption, normalizePath } from 'vite';
 import transform from './transform';
 import type { Route, VitePluginReactRouterDomOptions } from './types';
 
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 function vitePluginReactRouterDom(
   options: VitePluginReactRouterDomOptions,
 ): PluginOption {
   const { name: _name, option, root: _root } = options;
+
   const name = _name ?? 'router.config.js';
-  const root = _root ?? __dirname;
+  const root = _root ?? '/';
   const routerId = `${root}/${normalizePath(name)}`;
 
   return {
