@@ -1,36 +1,48 @@
 {
   "name": "vite-plugin-react-router-dom",
+  "description": "simplified react router with vite",
   "version": "0.0.1",
+  "author": "MSKYurina",
   "type": "module",
+  "homepage": "https://github.com/Hirate99/vite-plugin-react-router-dom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hirate99/vite-plugin-react-router-dom.git"
+  },
+  "license": "MIT",
   "files": [
     "dist",
     "index.d.ts"
   ],
-  "main": "./dist/vite-plugin-react-router-dom.umd.cjs",
+  "main": "./dist/vite-plugin-react-router-dom.cjs",
   "module": "./dist/vite-plugin-react-router-dom.js",
   "types": "./index.d.ts",
   "exports": {
     "types": "./index.d.ts",
     "import": "./dist/vite-plugin-react-router-dom.js",
-    "require": "./dist/vite-plugin-react-router-dom.umd.cjs"
+    "require": "./dist/vite-plugin-react-router-dom.cjs"
   },
   "scripts": {
     "prepare": "husky install",
-    "dev": "vite",
-    "build": "tsc && vite build"
+    "build": "rollup -c"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
     "@remix-run/router": "^1.4.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.15.3",
     "@types/react": "^18.0.28",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.0",
     "prettier": "^2.8.4",
+    "rollup": "^3.19.1",
     "typescript": "^4.9.4",
-    "vite": "^4.0.4"
+    "vite": "^4.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@rollup/plugin-terser": "^0.4.0"
+  }
 }
