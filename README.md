@@ -41,3 +41,9 @@ export default {
 ```
 
 See `example/router.config.js` for more usages.
+
+### Install
+
+```
+npm install --save-dev vite-plugin-react-router-dom
+```
