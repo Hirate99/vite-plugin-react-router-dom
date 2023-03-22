@@ -8,7 +8,7 @@ function vitePluginReactRouterDom(
   const { name: _name, option, root: _root } = options;
 
   const name = _name ?? 'router.config.js';
-  const root = _root ?? '/';
+  const root = _root ?? '';
   const routerId = `${root}/${normalizePath(name)}`;
 
   return {
