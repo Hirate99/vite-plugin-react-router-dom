@@ -1,4 +1,4 @@
-import type { ReactNode } from '@types/react';
+import type { ReactNode } from 'react';
 import type { PluginOption } from 'vite';
 import type {
   HydrationState,
@@ -22,7 +22,7 @@ export interface RouteItem {
 }
 
 export interface Route {
-  [key in string]: string | ExtendedRouteItem | Route;
+  [key: string]: string | RouteItem | Route;
 }
 
 export interface RouterOption {
@@ -38,5 +38,5 @@ export interface VitePluginReactRouterDomOptions {
 }
 
 export declare function vitePluginReactRouterDom(
-  option: VitePluginReactRouterDom,
+  option: VitePluginReactRouterDomOptions,
 ): PluginOption;

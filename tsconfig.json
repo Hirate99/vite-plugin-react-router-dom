@@ -14,7 +14,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "outDir": "dist",
+    "declarationMap": true
   },
-  "include": ["src"]
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist"]
 }
