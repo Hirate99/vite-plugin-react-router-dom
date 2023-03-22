@@ -16,9 +16,9 @@
   ],
   "main": "./dist/vite-plugin-react-router-dom.cjs",
   "module": "./dist/vite-plugin-react-router-dom.js",
-  "types": "./index.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "types": "./index.d.ts",
+    "types": "./dist/index.d.ts",
     "import": "./dist/vite-plugin-react-router-dom.js",
     "require": "./dist/vite-plugin-react-router-dom.cjs"
   },
