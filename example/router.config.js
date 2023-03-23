@@ -1,3 +1,4 @@
+/** @type import("../dist/index").Route */
 export default {
   '/': './src/App',
   '/demo': {
