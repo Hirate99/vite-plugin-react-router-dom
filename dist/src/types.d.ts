@@ -26,4 +26,3 @@ export interface VitePluginReactRouterDomOptions {
 }
 export declare function vitePluginReactRouterDom(option: VitePluginReactRouterDomOptions): PluginOption;
 export {};
-//# sourceMappingURL=types.d.ts.map
