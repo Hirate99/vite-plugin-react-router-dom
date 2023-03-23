@@ -16,8 +16,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "declaration": true,
-    "outDir": "dist",
-    "declarationMap": true
+    "outDir": "dist"
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist"]
