@@ -4,18 +4,34 @@ const getComponentName = (src: string) => {
   return src.replace(/^.*[\\\/]/, '');
 };
 
+const staticImport = (name: string, src: string) => {
+  return `import ${name} from '${src}'`;
+};
+
+const lazyImport = (name: string, src: string) => {
+  return `const ${name} = lazy(() => import('${src}'))`;
+};
+
 type ResolvedConfig = Pick<
   RouteItem,
-  | 'action'
-  | 'dynamic'
-  | 'errorElement'
-  | 'hasErrorBoundary'
-  | 'loader'
-  | 'shouldRevalidate'
->;
+  'action' | 'errorElement' | 'hasErrorBoundary' | 'loader' | 'shouldRevalidate'
+> & {
+  children?: string;
+};
 
-function transform(routes: Route, options: RouterOption = {}) {
-  const imports = new Map<string, boolean>();
+type RouteGenerationResult = {
+  imports: {
+    dynamic: string[];
+    static: string[];
+  };
+  routes: string[];
+};
+
+const imports = new Map<string, boolean>();
+
+function generate(routes: Route): RouteGenerationResult {
+  const dynamicImportSet = new Set<string>();
+  const staticImportSet = new Set<string>();
 
   const resolved = new Array<{
     route: string;
@@ -42,26 +58,33 @@ function transform(routes: Route, options: RouterOption = {}) {
         if (value.src) {
           const item = value as RouteItem;
           const src = item.src;
-          const dynamic = item.dynamic ?? true;
+          const dynamic = item.dynamic ?? false;
           resolveImports(src, dynamic);
           const config: ResolvedConfig = {};
           if (item.action) {
             config.action = item.action;
           }
-          if (item.dynamic) {
-            config.dynamic = item.dynamic;
-          }
           if (item.errorElement) {
             config.errorElement = item.errorElement;
           }
           if (item.hasErrorBoundary) {
-            config.errorElement = item.hasErrorBoundary;
+            config.hasErrorBoundary = item.hasErrorBoundary;
           }
           if (item.loader) {
             config.loader = item.loader;
           }
           if (item.shouldRevalidate) {
             config.shouldRevalidate = item.shouldRevalidate;
+          }
+          if (item.children) {
+            const children = generate(item.children);
+            children.imports.dynamic.forEach((value) => {
+              dynamicImportSet.add(value);
+            });
+            children.imports.static.forEach((value) => {
+              staticImportSet.add(value);
+            });
+            config.children = `${children.routes}`;
           }
 
           resolved.push({
@@ -83,17 +106,18 @@ function transform(routes: Route, options: RouterOption = {}) {
   };
 
   const generateImports = () => {
-    const statics = [];
-    const dynamics = [];
     for (const [src, dynamic] of imports) {
       const name = getComponentName(src);
       if (!dynamic) {
-        statics.push(`import ${name} from '${src}'`);
+        staticImportSet.add(staticImport(name, src));
       } else {
-        dynamics.push(`const ${name} = lazy(() => import('${src}'))`);
+        dynamicImportSet.add(lazyImport(name, src));
       }
     }
-    return [...statics, ...dynamics].join('\n');
+    return {
+      dynamic: Array.from(dynamicImportSet) ?? [],
+      static: Array.from(staticImportSet) ?? [],
+    };
   };
 
   const generateConfig = (config: ResolvedConfig) => {
@@ -111,6 +135,11 @@ function transform(routes: Route, options: RouterOption = {}) {
           } else {
             return `${value.toString()}`;
           }
+        }
+        if (key === 'children') {
+          return `${key}: [
+            ${value}
+          ],`;
         }
         return `${key}: ${value},`;
       })
@@ -133,15 +162,27 @@ function transform(routes: Route, options: RouterOption = {}) {
 
   resolveRoutes(routes);
 
+  return {
+    imports: generateImports(),
+    routes: generateRoutes(),
+  };
+}
+
+function transform(routes: Route, options: RouterOption = {}) {
+  imports.clear();
+
+  const { imports: _imports, routes: _routes } = generate(routes);
+
   const code = `
   import React from 'react';
   import { createBrowserRouter } from 'react-router-dom';
   import { lazy } from 'react';
 
-  ${generateImports()}
+  ${_imports.static.join('\n')}
+  ${_imports.dynamic.join('\n')}
   
   const router = createBrowserRouter(
-    [${generateRoutes()}],
+    [${_routes}],
     ${JSON.stringify(options)}
   );
   
