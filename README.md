@@ -1,6 +1,6 @@
 ## vite-plugin-react-router-dom
 
-A simple plugin intends to simplify code structure when using react-router-dom with vite. Supports dynamic imports.
+A simple plugin intends to simplify code structure when using react-router with vite. Supports dynamic imports.
 
 Before:
 
