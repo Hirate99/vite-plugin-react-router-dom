@@ -10,6 +10,7 @@ export interface RouteItem {
     shouldRevalidate?: RouteObject<'shouldRevalidate'>;
     hasErrorBoundary?: RouteObject<'hasErrorBoundary'>;
     errorElement?: ReactNode | null;
+    children?: Route;
 }
 export interface Route {
     [key: string]: string | RouteItem | Route;
