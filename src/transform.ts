@@ -17,6 +17,7 @@ type ResolvedConfig = Pick<
   'action' | 'errorElement' | 'hasErrorBoundary' | 'loader' | 'shouldRevalidate'
 > & {
   children?: string;
+  lazy?: string;
 };
 
 type RouteGenerationResult = {
@@ -76,6 +77,17 @@ function generate(routes: Route): RouteGenerationResult {
           if (item.shouldRevalidate) {
             config.shouldRevalidate = item.shouldRevalidate;
           }
+          if (item.dynamic) {
+            config.lazy = `async () => {
+              const imports = await import('${item.src}')
+              const component = imports.default ?? imports.Component;
+              const loader = imports.loader ? { loader: imports.loader } : {};
+              return {
+                Component: component,
+                ...loader,
+              }
+            }`;
+          }
           if (item.children) {
             const children = generate(item.children);
             children.imports.dynamic.forEach((value) => {
@@ -131,9 +143,9 @@ function generate(routes: Route): RouteGenerationResult {
             func = func.slice(asyncIdentifier.length, func.length).trim();
           }
           if (func.startsWith('function')) {
-            return `${key}: ${value.toString()}`;
+            return `${key}: ${value.toString()},`;
           } else {
-            return `${value.toString()}`;
+            return `${value.toString()},`;
           }
         }
         if (key === 'children') {
@@ -149,11 +161,17 @@ function generate(routes: Route): RouteGenerationResult {
   const generateRoutes = () => {
     return resolved.map(({ route, component, config: _config }) => {
       const config = _config ?? {};
+      const element = () => {
+        if (config.lazy) {
+          return '';
+        }
+        return `element: /*#__PURE__*/React.createElement(${component}, null),`;
+      };
 
       return `
         {
           path: '${route}',
-          element: /*#__PURE__*/React.createElement(${component}, null),
+          ${element()}
           ${generateConfig(config)}
         }
       `;
@@ -179,7 +197,6 @@ function transform(routes: Route, options: RouterOption = {}) {
   import { lazy } from 'react';
 
   ${_imports.static.join('\n')}
-  ${_imports.dynamic.join('\n')}
   
   const router = createBrowserRouter(
     [${_routes}],
